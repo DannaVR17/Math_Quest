@@ -73,7 +73,8 @@
     </div>
     <!-- Footer -->
     <div class="d-flex justify-content-between align-items-center mt-4">
-      <button class="btn btn-primary" @click="goToMatch">Hacer Match</button>
+      <button class="btn btn-primary" @click="goToMatch">Hacer quiz</button>
+      <button class="btn btn-success" @click="createMatch">Crear desafio</button>
       <div class="bg-light p-3 rounded shadow-sm text-center" style="width: 30%;">
         <h5 class="text-success">Ranking</h5>
         <p class="text-muted mb-0">Tu posición actual: #1</p>
@@ -83,6 +84,8 @@
 </template>
 <script>
 import api from '../services/api';
+import matchStore from "../store/matchStore";
+
 export default {
   name: "UserView",
   data() {
@@ -126,6 +129,9 @@ export default {
     declineInvitation(invitation) {
       console.log(`Rechazando invitación con ID: ${invitation}`);
       // Aquí puedes manejar la lógica de rechazo
+    },
+    createMatch() {
+      matchStore.createMatch();
     },
     async fetchTopics() {
       try {

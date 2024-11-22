@@ -23,7 +23,7 @@ const matchStore = reactive({
 
   async createMatch() {
     try {
-      const response = await api.post("/matches/create-with-logged-user", { sender: this.userId });
+      const response = await api.post("/matches/createWithLoggedUser", { sender: this.userId });
       console.log("Match created:", response.data);
 
       this.invitations.push(response.data.invitation);
