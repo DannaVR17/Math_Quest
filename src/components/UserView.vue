@@ -9,10 +9,45 @@
         <h2 class="h5 mb-0 text-primary">{{ user.name }}</h2>
       </div>
       <div>
-        <button class="btn btn-primary me-2">Configurar Perfil</button>
+        <button class="btn btn-primary me-2" @click="openNotifications">Notificaciones</button>
         <button class="btn btn-danger" @click="logout">Cerrar Sesión</button>
       </div>
     </div>
+
+    <!-- Modal de Notificaciones -->
+    <div v-if="showNotifications" class="modal fade show" tabindex="-1"
+      style="display: block; background: rgba(0, 0, 0, 0.5);" aria-modal="true" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Invitaciones Recibidas</h5>
+            <button type="button" class="btn-close" @click="closeNotifications"></button>
+          </div>
+          <div class="modal-body">
+            <ul v-if="invitations.length > 0" class="list-group">
+              <li v-for="invitation in invitations" :key="invitation._id"
+                class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <p>Invitación de: <strong>{{ invitation.sender.username }}</strong></p>
+                  <p>Estatus: {{ invitation.status }}</p>
+                </div>
+                <div>
+                  <button class="btn btn-success me-2" @click="acceptInvitation(invitation)">Aceptar</button>
+                  <button class="btn btn-danger" @click="declineInvitation(invitation)">Rechazar</button>
+                </div>
+              </li>
+            </ul>
+            <p v-else>No tienes nuevas invitaciones.</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="closeNotifications">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Fondo oscuro del modal -->
+    <div v-if="showNotifications" class="modal-backdrop fade show"></div>
+
     <!-- Search Bar -->
     <div class="d-flex justify-content-between align-items-center mt-4">
       <h3 class="h4 text-secondary">Temas a Estudiar</h3>
@@ -51,13 +86,13 @@ import api from '../services/api';
 export default {
   name: "UserView",
   data() {
-
     return {
-
       user: {},
       searchQuery: "",
       topics: [],
-      filteredTopics: []
+      filteredTopics: [],
+      showNotifications: false,
+      invitations: [],
     };
   },
   created() {
@@ -68,6 +103,30 @@ export default {
     };
   },
   methods: {
+    openNotifications() {
+      this.showNotifications = true; // Mostrar la modal de notificaciones
+      this.fetchInvitations(); // Obtener las invitaciones
+    },
+    closeNotifications() {
+      this.showNotifications = false; // Cerrar la modal
+    },
+    async fetchInvitations() {
+      try {
+        const userId = localStorage.getItem("userId");
+        const response = await api.get(`/invitation/${userId}`);
+        this.invitations = response.data;
+      } catch (error) {
+        console.error("Error al obtener las invitaciones:", error);
+      }
+    },
+    acceptInvitation(invitation) {
+      console.log(`Aceptando invitación con ID: ${invitation}`);
+      // Aquí puedes llamar al método de aceptar invitación en matchStore o realizar una solicitud a la API
+    },
+    declineInvitation(invitation) {
+      console.log(`Rechazando invitación con ID: ${invitation}`);
+      // Aquí puedes manejar la lógica de rechazo
+    },
     async fetchTopics() {
       try {
         const response = await api.get("/topics");
