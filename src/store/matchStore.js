@@ -1,90 +1,75 @@
 import { reactive } from "vue";
 import socket from "../sockets/socketInstance";
-
+import api from "@/services/api";
 
 const matchStore = reactive({
   socket,
-  invitations: [], // Invitaciones recibidas
-  currentMatch: null, // Datos de la partida actual
-  ranking: [], // Lista del ranking
+  userId: localStorage.getItem("userId"),
+  invitations: [],
+  currentMatch: null,
+  ranking: [],
 
-  // Enviar invitación
   sendInvitation(receiverId) {
     socket.emit("send-invitation", {
-      sender: localStorage.getItem("userId"), // ID del usuario actual
+      sender: this.userId,
       receiver: receiverId,
     });
   },
 
   registerUser(userId) {
-    socket.emit("register", userId); // Registrar el userId con el socket
+    this.userId = userId;
+    socket.emit("register", userId);
   },
 
-  async createMatch(senderId) {
+  async createMatch() {
     try {
-      const response = await fetch(
-        "http://localhost:5000/api/matches/create-with-logged-user",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ sender: senderId }),
-        }
-      );
+      const response = await api.post("/matches/create-with-logged-user", { sender: this.userId });
+      console.log("Match created:", response.data);
 
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Error creating match:", error.message);
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Match created:", data);
-
-      // Actualizar invitaciones
-      this.invitations.push(data.invitation);
+      this.invitations.push(response.data.invitation);
     } catch (error) {
-      console.error("Error creating match:", error);
+      console.error("Error creating match:", error.response?.data || error.message);
     }
   },
 
-  // Aceptar invitación
   acceptInvitation(invitation) {
-    this.currentMatch = invitation.match; // Actualiza el estado de la partida actual
+    this.currentMatch = invitation.match;
     socket.emit("accept-invitation", {
       matchId: invitation.matchId,
       players: invitation.players,
     });
   },
 
-  // Registrar respuesta
   submitAnswer(questionId, answer, responseTime) {
     socket.emit("submit-answer", {
       matchId: this.currentMatch.matchId,
-      playerId: localStorage.getItem("userId"),
+      playerId: this.userId,
       questionId,
       answer,
       responseTime,
     });
   },
 
-  // Actualizar ranking
   fetchRanking() {
     socket.emit("get-ranking");
   },
 });
 
-socket.on("receive-invitation", (invitation) => {
-  matchStore.invitations.push(invitation);
-});
+function initializeSocketListeners() {
+  socket.on("receive-invitation", (invitation) => {
+    matchStore.invitations.push(invitation);
+  });
 
-socket.on("start-game", (match) => {
-  matchStore.currentMatch = match;
-});
+  socket.on("start-game", (match) => {
+    matchStore.currentMatch = match;
+  });
 
-socket.on("update-ranking", (ranking) => {
-  matchStore.ranking = ranking;
-});
+  socket.on("update-ranking", (ranking) => {
+    matchStore.ranking = ranking;
+  });
+}
+
+// Inicializar los eventos de socket
+initializeSocketListeners();
 
 export default matchStore;

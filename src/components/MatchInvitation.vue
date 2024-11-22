@@ -1,39 +1,34 @@
 <template>
-    <div>
-      <!-- Modal -->
-      <div
-        v-if="showModal"
-        class="modal fade show"
-        tabindex="-1"
-        style="display: block; background: rgba(0, 0, 0, 0.5);"
-        aria-modal="true"
-        role="dialog"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">¡Nueva Invitación!</h5>
-              <button type="button" class="btn-close" @click="declineInvitation"></button>
-            </div>
-            <div class="modal-body">
-              <p>Has recibido una invitación para jugar de <strong>{{ invitation.senderName }}</strong>.</p>
-              <p>¿Deseas aceptar?</p>
-            </div>
-            <div class="modal-footer">
-              <button class="btn btn-secondary" @click="declineInvitation">Rechazar</button>
-              <button class="btn btn-primary" @click="acceptInvitation">Aceptar</button>
-            </div>
+  <div>
+    <!-- Modal -->
+    <div v-if="showModal" class="modal fade show" tabindex="-1" style="display: block; background: rgba(0, 0, 0, 0.5);"
+      aria-modal="true" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">¡Nueva Invitación!</h5>
+            <button type="button" class="btn-close" @click="declineInvitation"></button>
+          </div>
+          <div class="modal-body">
+            <p>Has recibido una invitación para jugar de <strong>{{ invitation.senderName }}</strong>.</p>
+            <p>¿Deseas aceptar?</p>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="declineInvitation">Rechazar</button>
+            <button class="btn btn-primary" @click="acceptInvitation">Aceptar</button>
           </div>
         </div>
       </div>
-  
-      <!-- Fondo oscuro del modal -->
-      <div v-if="showModal" class="modal-backdrop fade show"></div>
     </div>
-  </template>
-  
-  <script>
+
+    <!-- Fondo oscuro del modal -->
+    <div v-if="showModal" class="modal-backdrop fade show"></div>
+  </div>
+</template>
+
+<script>
 import matchStore from "../store/matchStore";
+import api from '../services/api';
 
 export default {
   data() {
@@ -66,6 +61,17 @@ export default {
       this.showModal = false; // Cierra la modal
       this.invitation = null; // Limpia la invitación actual
     },
+    async fetchInvitation() {
+      try {
+        const userId = localStorage.getItem("userId");
+        const response = await api.get(`/invitation/${userId}`);
+        console.log(response);
+
+        // this.invitation = response.data;
+      } catch (error) {
+        console.error("Error al obtener los temas:", error);
+      }
+    },
   },
   mounted() {
     // Escuchar el evento de invitación
@@ -73,19 +79,21 @@ export default {
       console.log("Nueva invitación recibida:", invitation);
       this.handleInvitation(invitation); // Manejar la invitación
     });
+
   },
   beforeUnmount() {
     // Desconectar el evento cuando se desmonte el componente
     matchStore.socket.off("receive-invitation");
+    this.fetchInvitation();
   },
 };
 </script>
-  <style scoped>
-  .modal {
-    z-index: 1050;
-  }
-  
-  .modal-backdrop {
-    z-index: 1040;
-  }
-  </style>
+<style scoped>
+.modal {
+  z-index: 1050;
+}
+
+.modal-backdrop {
+  z-index: 1040;
+}
+</style>
