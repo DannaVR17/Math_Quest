@@ -1,0 +1,96 @@
+/* Estilos globales */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #4caf50, #2196f3);
+  color: #fff;
+}
+
+.header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.header p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #4CAF50, #2196F3);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+  }
+  
+  /* Contenedor de formularios compartido */
+  .form-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  h1 {
+    color: #2196F3;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Botones compartidos */
+  .btn-primary {
+    background-color: #2196F3;
+    border: none;
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1976D2;
+  }
+  
+  .btn-secondary {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #388E3C;
+  }
+  
+  /* Otros estilos compartidos */
+  .form-check-label {
+    color: #2196F3;
+  }
+  
+  .register-link {
+    color: #4CAF50;
+    text-decoration: none;
+  }
+  
+  .register-link:hover {
+    text-decoration: underline;
+  }
+  
+  .imgprofile {
+    height: 5px;;
+    width: 5px;
+  }
