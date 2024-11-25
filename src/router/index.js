@@ -19,6 +19,12 @@ const routes = [
     meta: { requiresAuth: true }, // Requiere autenticación
   },
   { path: '/match', component: MatchQuestionsView, name: 'MatchQuestions', meta: { requiresAuth: true } },
+  {
+    path: "/quiz/:topicId",
+    name: "MatchQuestions",
+    component: MatchQuestionsView,
+},
+
 ];
 
 const router = createRouter({

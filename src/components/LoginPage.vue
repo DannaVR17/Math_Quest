@@ -1,18 +1,31 @@
 <template>
   <div class="login-container">
-    <h2>Iniciar Sesión</h2>
-    <form @submit.prevent="loginUser">
-      <div class="mb-3">
+    <button class="btn btn-secondary small-btn back-btn" @click="goBack">Volver</button>
+    <div class="form-wrapper">
+      <h2>Iniciar Sesión</h2>
+      <form class="form-container" @submit.prevent="loginUser">
         <label for="username" class="form-label">Usuario</label>
-        <input type="text" v-model="username" class="form-control" placeholder="Ingresa tu usuario" />
-      </div>
-      <div class="mb-3">
+        <input
+          type="text"
+          id="username"
+          v-model="username"
+          class="form-control"
+          placeholder="Ingresa tu usuario"
+        />
         <label for="password" class="form-label">Contraseña</label>
-        <input type="password" v-model="password" class="form-control" placeholder="Ingresa tu contraseña" />
-      </div>
-      <button type="submit" class="btn btn-primary w-100 mb-2">Iniciar Sesión</button>
-    </form>
-    <router-link to="/register">¿No tienes cuenta? Regístrate</router-link>
+        <input
+          type="password"
+          id="password"
+          v-model="password"
+          class="form-control"
+          placeholder="Ingresa tu contraseña"
+        />
+        <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
+      </form>
+      <router-link to="/register" class="register-link">
+        ¿No tienes cuenta? Regístrate
+      </router-link>
+    </div>
   </div>
 </template>
 
@@ -50,6 +63,9 @@ export default {
       } catch (error) {
         alert("Hubo un problema con el servidor.");
       }
+    },
+    goBack() {
+      this.$router.go(-1);
     },
   },
 };

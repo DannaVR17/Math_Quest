@@ -1,22 +1,19 @@
 <template>
   <div class="container my-4">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center p-3 rounded shadow-sm"
-      style="background: rgba(255, 255, 255, 0.5);">
-      <div class="d-flex align-items-center">
-        <img src="../assets/foto1.jpg" alt="User profile picture" class="rounded-circle me-3"
-          style="width: 50px; height: 50px;" />
-        <h2 class="h5 mb-0 text-primary">{{ user.name }}</h2>
+    <div class="header-container">
+      <div class="user-info">
+        <img src="../assets/foto1.jpg" alt="User profile picture" class="profile-picture" />
+        <h2>{{ user.name }}</h2>
       </div>
-      <div>
-        <button class="btn btn-primary me-2" @click="openNotifications">Notificaciones</button>
-        <button class="btn btn-danger" @click="logout">Cerrar Sesión</button>
+      <div class="header-buttons">
+        <button class="btn btn-primary small-btn" @click="openNotifications">Notificaciones</button>
+        <button class="btn btn-danger small-btn" @click="logout">Cerrar Sesión</button>
       </div>
     </div>
 
     <!-- Modal de Notificaciones -->
-    <div v-if="showNotifications" class="modal fade show" tabindex="-1"
-      style="display: block; background: rgba(0, 0, 0, 0.5);" aria-modal="true" role="dialog">
+    <div v-if="showNotifications" class="modal fade show" tabindex="-1" aria-modal="true" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -25,63 +22,70 @@
           </div>
           <div class="modal-body">
             <ul v-if="invitations.length > 0" class="list-group">
-              <li v-for="invitation in invitations" :key="invitation._id"
-                class="list-group-item d-flex justify-content-between align-items-center">
+              <li v-for="invitation in invitations" :key="invitation._id" class="list-group-item">
                 <div>
                   <p>Invitación de: <strong>{{ invitation.sender.username }}</strong></p>
                   <p>Estatus: {{ invitation.status }}</p>
                 </div>
                 <div>
-                  <button class="btn btn-success me-2" @click="acceptInvitation(invitation)">Aceptar</button>
-                  <button class="btn btn-danger" @click="declineInvitation(invitation)">Rechazar</button>
+                  <button class="btn btn-primary small-btn" @click="acceptInvitation(invitation)">Aceptar</button>
+                  <button class="btn btn-danger small-btn" @click="declineInvitation(invitation)">Rechazar</button>
                 </div>
               </li>
             </ul>
             <p v-else>No tienes nuevas invitaciones.</p>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" @click="closeNotifications">Cerrar</button>
+            <button class="btn btn-secondary small-btn" @click="closeNotifications">Cerrar</button>
           </div>
         </div>
       </div>
     </div>
-    <!-- Fondo oscuro del modal -->
-    <div v-if="showNotifications" class="modal-backdrop fade show"></div>
 
     <!-- Search Bar -->
-    <div class="d-flex justify-content-between align-items-center mt-4">
-      <h3 class="h4 text-secondary">Temas a Estudiar</h3>
-      <input type="text" class="form-control w-50" placeholder="Buscar temas..." v-model="searchQuery"
-        @input="searchTopics" />
+    <div class="search-bar mt-4">
+      <h3 class="h4">Temas a Estudiar</h3>
+      <input type="text" placeholder="Buscar temas..." v-model="searchQuery" @input="searchTopics" />
     </div>
+
     <!-- Topics -->
     <div class="row mt-4">
-      <div v-for="topic in filteredTopics" :key="topic._id" class="col-md-4 col-sm-6 mb-4">
-        <div class="card shadow-sm">
+      <div v-for="topic in filteredTopics" :key="topic._id" class="col-md-4 col-sm-6">
+        <div class="card">
           <div class="card-body">
-            <h5 class="card-title text-success">{{ topic.name }}</h5>
-            <p class="card-text text-muted">{{ topic.description }}</p>
-            <button class="btn btn-primary mt-2" @click="goToTopic(topic._id)">
-              Ver Detalle
-            </button>
+            <h5 class="card-title">{{ topic.category }}</h5>
+            <p class="card-text">{{ topic.description }}</p>
+            <button class="btn btn-primary small-btn mt-2" @click="goToTopic(topic._id)">Ver Detalle</button>
           </div>
         </div>
       </div>
-      <div v-if="filteredTopics.length === 0" class="col-12 text-center mt-4">
+      <div v-if="filteredTopics.length === 0" class="col-12 text-center">
         <p class="text-muted">No se ha encontrado el tema</p>
       </div>
     </div>
+
     <!-- Footer -->
-    <div class="d-flex justify-content-between align-items-center mt-4">
-      <button class="btn btn-primary" @click="goToMatch">Hacer quiz</button>
-      <button class="btn btn-success" @click="createMatch">Crear desafio</button>
-      <div class="bg-light p-3 rounded shadow-sm text-center" style="width: 30%;">
-        <h5 class="text-success">Ranking</h5>
-        <p class="text-muted mb-0">Tu posición actual: #1</p>
+    <div class="footer d-flex justify-content-between align-items-center mt-4">
+
+      <button class="btn btn-secondary small-btn" @click="createMatch">Crear desafío</button>
+      <div class="ranking-box">
+        <h3>Ranking Global</h3>
+        <ul class="list-group">
+          <li v-for="(rank, index) in ranking" :key="rank.user._id"
+            class="list-group-item d-flex justify-content-between align-items-center">
+            <span>
+              #{{ index + 1 }} {{ rank.user.username }}
+            </span>
+            <span>{{ rank.totalScore }} puntos</span>
+          </li>
+        </ul>
+        <p v-if="ranking.length === 0" class="text-muted">No hay usuarios en el ranking aún.</p>
+
       </div>
     </div>
   </div>
 </template>
+
 <script>
 import api from '../services/api';
 import matchStore from "../store/matchStore";
@@ -96,6 +100,7 @@ export default {
       filteredTopics: [],
       showNotifications: false,
       invitations: [],
+      ranking: []
     };
   },
   created() {
@@ -159,13 +164,21 @@ export default {
     goToTopic(topicId) {
       this.$router.push({ name: "TopicDetailView", params: { _id: topicId } });
     },
-    goToMatch() {
-      this.$router.push({ name: "MatchQuestions" });
+    async fetchRanking() {
+      try {
+        const response = await api.get("/score");
+        this.ranking = response.data.map((rank) => ({
+          user: rank.user,
+          totalScore: rank.totalScore,
+        }));
+      } catch (error) {
+        console.error("Error al obtener el ranking:", error);
+      }
     },
-
   },
   mounted() {
     this.fetchTopics(); // Llamamos al método cuando el componente se monta
+    this.fetchRanking();
   },
 };
 </script>
