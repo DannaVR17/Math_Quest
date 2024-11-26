@@ -1,6 +1,5 @@
 # Base image
-# Usa la imagen base de Node.js
-FROM node:22.11.0
+FROM node:22.11.0 AS build
 
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
@@ -17,11 +16,14 @@ COPY . .
 # Construye la aplicación para producción
 RUN npm run build
 
-# Usa una imagen ligera para servir la aplicación (por ejemplo, Nginx)
+# Usa una imagen ligera para servir la aplicación
 FROM nginx:alpine
 
+# Copia el archivo de configuración personalizado
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copia los archivos construidos al directorio de Nginx
-COPY --from=0 /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Expone el puerto en el que Nginx escucha
 EXPOSE 80

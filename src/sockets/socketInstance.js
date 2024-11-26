@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5000"); // Reemplaza con la URL de tu backend
+const socket = io(process.env.VUE_APP_API_URL); // Reemplaza con la URL de tu backend
 
 socket.on("connect", () => {
     console.log(`Conectado a Socket.IO con ID: ${socket.id}`);

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api', // URL del backend
+    baseURL: process.env.VUE_APP_API_URL, // Usar la variable de entorno para la URL del backend
     timeout: 10000, // Tiempo de espera
 });
 
